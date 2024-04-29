@@ -1,0 +1,33 @@
+import hashlib
+
+def crack_password(hash_to_crack, password_list):
+    for password in password_list:
+        hashed_password = hashlib.sha256(password.encode()).hexdigest()
+        if hashed_password == hash_to_crack:
+            return password
+    return None
+
+def main():
+    # Example hash to crack
+    hash_to_crack = (
+        "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8"
+    )
+
+    # Example password list
+    password_list = [
+        "password",
+        "123456",
+        "qwerty",
+        "letmein",
+        "password123"
+    ]
+
+    # Attempt to crack the password
+    cracked_password = crack_password(hash_to_crack, password_list)
+    if cracked_password:
+        print("Password cracked:", cracked_password)
+    else:
+        print("Password not found in the provided list.")
+
+if _name_ == "_main_":
+    main()
