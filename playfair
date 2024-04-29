@@ -1,0 +1,66 @@
+#include <iostream>
+#include <string>
+#include <map>
+
+// Function to preprocess the key and create the extended Playfair matrix
+std::string preprocessKey(const std::string& key) {
+    std::map<char, bool> seen;
+    std::string extendedMatrix;
+
+    for (char ch : key) {
+        if (isalnum(ch) || ch == ' ') {
+            if (!seen[ch]) {
+                extendedMatrix += ch;
+                seen[ch] = true;
+            }
+        }
+    }
+
+    for (char ch = 'A'; ch <= 'Z'; ++ch) {
+        if (!seen[ch]) {
+            extendedMatrix += ch;
+            seen[ch] = true;
+        }
+    }
+
+    for (char ch = 'a'; ch <= 'z'; ++ch) {
+        if (!seen[ch]) {
+            extendedMatrix += ch;
+            seen[ch] = true;
+        }
+    }
+
+    for (char ch = '0'; ch <= '9'; ++ch) {
+        if (!seen[ch]) {
+            extendedMatrix += ch;
+            seen[ch] = true;
+        }
+    }
+
+    extendedMatrix += "!@#$%^&*()_+-=[]{}|;':,.<>?/";
+
+    return extendedMatrix;
+}
+
+// Function to display the extended Playfair matrix
+void displayMatrix(const std::string& matrix) {
+    int size = static_cast<int>(matrix.size());
+
+    for (int i = 0; i < size; ++i) {
+        std::cout << matrix[i] << " ";
+        if ((i + 1) % 10 == 0) std::cout << std::endl;
+    }
+}
+
+int main() {
+    std::string key;
+    std::cout << "Enter the key for Playfair cipher: ";
+    std::getline(std::cin, key);
+
+    std::string extendedMatrix = preprocessKey(key);
+
+    std::cout << "Extended Playfair matrix:" << std::endl;
+    displayMatrix(extendedMatrix);
+
+    return 0;
+}
