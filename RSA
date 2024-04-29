@@ -1,0 +1,95 @@
+#include <iostream>
+#include <cmath>
+bool isPrime(int n)
+{
+    if (n <= 1)
+        return false;
+    if (n <= 3)
+        return true;
+    if (n % 2 == 0 || n % 3 == 0)
+        return false;
+
+    for (int i = 5; i * i <= n; i += 6)
+    {
+        if (n % i == 0 || n % (i + 2) == 0)
+            return false;
+    }
+    return true;
+}
+// Function to generate large prime numbers
+int generatePrime(int keySize)
+{
+    int prime;
+    do
+    {
+        prime = rand() % (int)pow(2, keySize) + (int)pow(2, keySize - 1); // Random number in the range [2^(keySize-1), 2^keySize - 1]
+    } while (!isPrime(prime));
+    return prime;
+}
+// Function to calculate modular exponentiation
+int modPow(int base, int exponent, int modulus)
+{
+    int result = 1;
+    base = base % modulus;
+    while (exponent > 0)
+    {
+        if (exponent % 2 == 1)
+        {
+            result = (result * base) % modulus;
+        }
+        exponent = exponent >> 1;
+        base = (base * base) % modulus;
+    }
+    return result;
+}
+// Function to calculate modular inverse using Extended Euclidean Algorithm
+int modInverse(int a, int m)
+{
+    int m0 = m, t, q;
+    int x0 = 0, x1 = 1;
+    if (m == 1)
+        return 0;
+    // Apply extended Euclid Algorithm
+    while (a > 1)
+    {
+        q = a / m;
+        t = m;
+        m = a % m, a = t;
+        t = x0;
+        x0 = x1 - q * x0;
+        x1 = t;
+    }
+    // Make x1 positive
+    if (x1 < 0)
+        x1 += m0;
+    return x1;
+}
+
+int main()
+{
+    srand(time(NULL)); // Seed random number generator
+    int keySize = 10;  // Key size (for demonstration)
+    int p, q, n, phi_n, e, d;
+    // Generate two large prime numbers
+    p = generatePrime(keySize);
+    q = generatePrime(keySize);
+    n = p * q;
+    phi_n = (p - 1) * (q - 1);
+    // Choose public exponent 'e'
+    e = 65537;
+    // Calculate private exponent 'd'
+    d = modInverse(e, phi_n);
+    std::cout << "Public key: (n, e) = (" << n << ", " << e << ")" << std::endl;
+    std::cout << "Private key: d = " << d << std::endl;
+    // Message to be encrypted
+    int message;
+    std::cout << "Enter the message (integer between 0 and " << n - 1 << "): ";
+    std::cin >> message;
+    // Encryption
+    int ciphertext = modPow(message, e, n);
+    std::cout << "Ciphertext: " << ciphertext << std::endl;
+    // Decryption
+    int plaintext = modPow(ciphertext, d, n);
+    std::cout << "Plaintext: " << plaintext << std::endl;
+    return 0;
+}
