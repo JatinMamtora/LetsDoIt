@@ -1,0 +1,56 @@
+import hashlib
+from Crypto.Cipher import AES
+from Crypto.Random import get_random_bytes
+
+def sha256_hash(message: str) -> bytes:
+    """
+    Compute SHA256 hash of a message.
+    """
+    hash_object = hashlib.sha256()
+    hash_object.update(message.encode())
+    return hash_object.digest()
+
+def encrypt_message(message, key):
+    """
+    Encrypt a message using AES encryption with a given key.
+    """
+    cipher = AES.new(key, AES.MODE_EAX)
+    ciphertext, tag = cipher.encrypt_and_digest(message.encode())
+    return ciphertext, cipher.nonce, tag
+
+def decrypt_message(encrypted_message, key, nonce, tag):
+    """
+    Decrypt an encrypted message using AES decryption with a given key, nonce, and tag.
+    """
+    cipher = AES.new(key, AES.MODE_EAX, nonce=nonce)
+    decrypted_message = cipher.decrypt_and_verify(encrypted_message, tag)
+    return decrypted_message.decode()
+
+def main():
+    # Example message
+    original_message = "Hello, Alice!"
+    print("Original Message:", original_message)
+
+    # Example shared secret key (should be securely shared between Bob and Alice)
+    secret_key = get_random_bytes(16)  # 16 bytes for AES-128
+    print("Secret Key:", secret_key.hex())
+
+    # Step 1: Bob's side
+    hashed_message = sha256_hash(original_message)
+    print("Hash of Message:", hashed_message.hex())
+
+    encrypted_message, nonce, tag = encrypt_message(original_message, secret_key)
+    print("Encrypted Message:", encrypted_message.hex())
+
+    # Step 2: Alice's side
+    decrypted_message = decrypt_message(encrypted_message, secret_key, nonce, tag)
+    print("Decrypted Message:", decrypted_message)
+
+    received_hash = sha256_hash(decrypted_message)
+    print("Received Hash:", received_hash.hex())
+
+    if received_hash == hasshed_message:
+      print("done")
+
+if __name__ == "__main__":
+    main()
